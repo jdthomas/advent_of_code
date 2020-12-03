@@ -24,20 +24,14 @@ int check_slope(const std::vector<std::string> &inputs, const int step_x,
   }
   return collisions;
 }
+using Input = std::vector<std::string>;
 
-int main(int argc, char **argv) {
-  std::ifstream input_file(argv[1], std::ios_base::in);
-  std::vector<std::string> inputs;
-
-  std::copy(std::istream_iterator<std::string>(input_file),
-            std::istream_iterator<std::string>(), std::back_inserter(inputs));
-  fmt::print("{}\n", inputs);
-
+int solve_problem_1(const Input &inputs) {
   const int step_x = 3, step_y = 1;
   auto collisions = check_slope(inputs, step_x, step_y);
-  fmt::print("Collisions: {}", collisions);
-
-  // part 2
+  return collisions;
+}
+int solve_problem_2(const Input &inputs) {
   std::array<std::pair<int, int>, 5> slopes = {{
       {1, 1},
       {3, 1},
@@ -55,5 +49,34 @@ int main(int argc, char **argv) {
   //   auto [xstep, ystep] = slope;
   //   result *= check_slope(inputs, xstep, ystep);
   // }
-  fmt::print("Result pt2: {}", result);
+  return result;
+}
+
+int main(int argc, char **argv) {
+  std::ifstream input_file(argv[1], std::ios_base::in);
+  Input inputs;
+
+  std::copy(std::istream_iterator<std::string>(input_file),
+            std::istream_iterator<std::string>(), std::back_inserter(inputs));
+  fmt::print("{}\n", inputs);
+
+  // part 2
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto answer = solve_problem_1(inputs);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
+  }
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto answer = solve_problem_2(inputs);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
+  }
 }

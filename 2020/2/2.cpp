@@ -28,24 +28,9 @@ template <> struct fmt::formatter<Policy> {
                           policy.letter);
   }
 };
+using Input = std::vector<std::pair<Policy, std::string>>;
 
-
-int main(int argc, char **argv) {
-  std::ifstream input_file(argv[1], std::ios_base::in);
-  std::vector<std::pair<Policy, std::string>> inputs;
-
-  Policy policy{};
-  std::string sep;
-  std::string password;
-
-  // TODO: better parsing code?
-  while (input_file >> policy.min >> policy.max >> policy.letter >> sep >>
-         password) {
-    // Hack, just abs the max, it parses the - as a minus .. meh
-    policy.max = -policy.max;
-    inputs.emplace_back(std::make_pair(policy, password));
-  }
-
+int solve_problem_1(const Input &inputs) {
   // Count the valid strings
   auto valid = accumulate(inputs | views::transform([](auto input) {
                             auto [p, pw] = input;
@@ -60,19 +45,54 @@ int main(int argc, char **argv) {
                           }),
                           0);
 
-  // fmt::print("{}\n", inputs);
-  fmt::print("{}\n", valid);
-
-  //////////////////////////////////////////////////////////////////////////////
-  //part 2
+  return valid;
+}
+int solve_problem_2(const Input &inputs) {
   // Count the valid strings
-  auto valid2 = accumulate(inputs | views::transform([](auto input) {
-                            auto [p, pw] = input;
-                            // apply policy to the count
-                            return (pw[p.min-1] == p.letter && pw[p.max-1] != p.letter || pw[p.min-1] != p.letter && pw[p.max-1] == p.letter) ? 1 : 0;
-                          })
-                          ,0);
+  auto valid = accumulate(
+      inputs | views::transform([](auto input) {
+        auto [p, pw] = input;
+        // apply policy to the count
+        return (pw[p.min - 1] == p.letter && pw[p.max - 1] != p.letter ||
+                pw[p.min - 1] != p.letter && pw[p.max - 1] == p.letter)
+                   ? 1
+                   : 0;
+      }),
+      0);
+  return valid;
+}
 
-  // fmt::print("{}\n", inputs);
-  fmt::print("{}\n", valid2);
+int main(int argc, char **argv) {
+  std::ifstream input_file(argv[1], std::ios_base::in);
+  Input inputs;
+
+  Policy policy{};
+  std::string sep;
+  std::string password;
+
+  // TODO: better parsing code?
+  while (input_file >> policy.min >> policy.max >> policy.letter >> sep >>
+         password) {
+    // Hack, just abs the max, it parses the - as a minus .. meh
+    policy.max = -policy.max;
+    inputs.emplace_back(std::make_pair(policy, password));
+  }
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto answer = solve_problem_1(inputs);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
+  }
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto answer = solve_problem_2(inputs);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
+  }
 }
