@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -33,17 +34,12 @@ int solve_problem_2(const Input &inputs) {
   auto seat_ids = to_seat_ids(inputs);
   actions::sort(seat_ids);
 
-  // I think I can do this with adjacent_difference, but not intuative :/
-  auto last = seat_ids[0];
-  for (auto seat : seat_ids | views::drop(1)) {
-    last++;
-    while (last < seat) {
-      fmt::print(" missing {} ({})\n", seat, last);
-      return last;
-      last++;
-    }
+  auto found = std::adjacent_find(begin(seat_ids), end(seat_ids),
+                                  [](auto a, auto b) { return a + 1 != b; });
+  if (found != end(seat_ids)) {
+    return *found +
+           1 /* found is the lower bound of our search, e.g. last found item */;
   }
-  // fmt::print("{}\n",seat_ids);
   return -1;
 }
 
