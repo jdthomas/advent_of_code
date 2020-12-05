@@ -10,9 +10,42 @@ using namespace ranges;
 #include <fmt/ranges.h>
 
 using Input = std::vector<std::string>;
-int solve_problem_1(const Input &inputs) { return 42; }
 
-int solve_problem_2(const Input &inputs) { return 42; }
+std::vector<unsigned int> to_seat_ids(const Input &inputs) {
+  return inputs | views::transform([](auto seat_code) {
+           auto row = accumulate(
+               seat_code | views::take(7) |
+                   views::transform([](auto c) { return c == 'F' ? 0 : 1; }),
+               0u, [](auto a, auto b) { return b + (a << 1); });
+           auto seat = accumulate(
+               seat_code | views::drop(7) |
+                   views::transform([](auto c) { return c == 'L' ? 0 : 1; }),
+               0u, [](auto a, auto b) { return b + (a << 1); });
+           // fmt::print("row {} seat {}\n", row, seat);
+           return row * 8 + seat;
+         }) |
+         to<std::vector>;
+}
+
+int solve_problem_1(const Input &inputs) { return max(to_seat_ids(inputs)); }
+
+int solve_problem_2(const Input &inputs) {
+  auto seat_ids = to_seat_ids(inputs);
+  actions::sort(seat_ids);
+
+  // I think I can do this with adjacent_difference, but not intuative :/
+  auto last = seat_ids[0];
+  for (auto seat : seat_ids | views::drop(1)) {
+    last++;
+    while (last < seat) {
+      fmt::print(" missing {} ({})\n", seat, last);
+      return last;
+      last++;
+    }
+  }
+  // fmt::print("{}\n",seat_ids);
+  return -1;
+}
 
 int main(int argc, char **argv) {
   std::ifstream input_file(argv[1], std::ios_base::in);
