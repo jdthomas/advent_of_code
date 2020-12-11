@@ -78,13 +78,11 @@ const std::unordered_map<std::string, Validator> validators{
               (val | views::transform([](auto x) { return std::isdigit(x); }) |
                views::all);
      }},
-    {"cid",
-     [](std::string val) {
+    {"cid", [](std::string val) {
        //(Country ID) - ignored, missing or not.
        // return false so we just ignore this when counting valid fields, yuk
        return false;
-     }}
-};
+     }}};
 
 int solve_problem_1(const Input &inputs) {
   return accumulate(
@@ -99,7 +97,7 @@ int solve_problem_1(const Input &inputs) {
                          : 0;
             }),
             0);
-        //fmt::print("{} has {} fields\n", fields, ct);
+        // fmt::print("{} has {} fields\n", fields, ct);
         return ct == required_fields.size() ? 1 : 0;
       }),
       0);
@@ -122,7 +120,7 @@ int solve_problem_2(const Input &inputs) {
               return v != validators.end() && v->second(field_val);
             }) | views::all,
             0);
-        //fmt::print("{} has {} fields\n", fields, ct);
+        // fmt::print("{} has {} fields\n", fields, ct);
         return ct == required_fields.size() ? 1 : 0;
       }),
       0);
