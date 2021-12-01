@@ -5,24 +5,41 @@
 
 #include <range/v3/action/sort.hpp>
 #include <range/v3/all.hpp>
-using namespace ranges;
 
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
 using InputItem = int64_t;
 using Input = std::vector<InputItem>;
-using Position = std::pair<double, double>;
 
-int solve_problem_1(const Input &inputs) { return 42; }
+int solve_problem_1(const Input &inputs) {
+  using namespace ranges;
+  Input partial(inputs.size());
+  adjacent_difference(inputs, partial,
+                      [](auto a, auto b) { return a > b ? 1 : 0; });
 
-int solve_problem_2(const Input &inputs) { return 42; }
+  return accumulate(partial | views::drop(1), 0);
+}
+
+int solve_problem_2(const Input &inputs) {
+  using namespace ranges;
+  Input partial(inputs.size());
+  adjacent_difference(
+      inputs | views::sliding(3) |
+          views::transform([](auto window) { return accumulate(window, 0); }),
+      partial, [](auto a, auto b) { return a > b ? 1 : 0; });
+
+  return accumulate(partial | views::drop(1), 0);
+}
 
 int main(int argc, char **argv) {
-  if (argc < 2)
-    return -1;
+  if (argc < 2) {
+    fmt::print("specify an input file please\n");
+    return 1;
+  }
   std::ifstream input_file(argv[1], std::ios_base::in);
-  Input inputs = istream_range<InputItem>(input_file) | to<Input>();
+  Input inputs =
+      ranges::istream_range<InputItem>(input_file) | ranges::to<Input>();
 
   fmt::print("{}\n", inputs);
 
