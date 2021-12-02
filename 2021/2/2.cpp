@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <variant>
 #include <vector>
 
 #include <range/v3/action/sort.hpp>
@@ -9,70 +10,69 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
-enum class Direction {
-  FORWARD,
-  UP,
-  DOWN,
+struct CmdImpl {
+  int64_t dist;
 };
+struct Forward : CmdImpl {};
+struct Up : CmdImpl {};
+struct Down : CmdImpl {};
+using Command = std::variant<Forward, Up, Down>;
 
-using InputItem = std::pair<Direction, int64_t>;
+template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template <class... Ts> overload(Ts...) -> overload<Ts...>;
+
+using InputItem = Command;
 using Input = std::vector<InputItem>;
 using Position = std::pair<int64_t, int64_t>;
 
 int64_t solve_problem_1(const Input &inputs) {
-  using namespace ranges;
   auto position = ranges::accumulate(
       inputs, Position{0, 0},
       [](const auto &a, const auto &b) {
         return std::make_pair(a.first + b.first, a.second + b.second);
       },
-      [](const auto &p) -> std::pair<int64_t, int64_t> {
-        auto &[dir, dist] = p;
-        switch (dir) {
-        case Direction::FORWARD:
-          return {dist, 0};
-        case Direction::UP:
-          return {0, -dist};
-        case Direction::DOWN:
-          return {0, dist};
-        }
-        return {0, 0};
+      [](const Command &p) {
+        return std::visit(overload{
+                              // clang-format off
+                              [](Forward c) -> Position { return {c.dist, 0}; },
+                              [](Up c) -> Position { return {0, -c.dist}; },
+                              [](Down c) -> Position { return {0, c.dist}; },
+                              // clang-format on
+                          },
+                          p);
       });
   return position.first * position.second;
 }
 
 int solve_problem_2(const Input &inputs) {
-  using namespace ranges;
   int64_t aim{0};
   auto position = ranges::accumulate(
       inputs, Position{0, 0},
       [](const auto &a, const auto &b) {
         return std::make_pair(a.first + b.first, a.second + b.second);
       },
-      [&aim](const auto &p) -> std::pair<int64_t, int64_t> {
-        auto &[dir, dist] = p;
-        switch (dir) {
-        case Direction::FORWARD:
-          return {dist, aim * dist};
-        case Direction::UP:
-          aim -= dist;
-          return {0, 0};
-        case Direction::DOWN:
-          aim += dist;
-          return {0, 0};
-        }
-        return {0, 0};
+      [&aim](const Command &p) {
+        return std::visit(overload{
+                              // clang-format off
+                              [&aim](Forward c) -> Position { return {c.dist, aim * c.dist}; },
+                              [&aim](Up c) -> Position { aim -= c.dist; return {0, 0}; },
+                              [&aim](Down c) -> Position { aim += c.dist; return {0, 0}; },
+                              // clang-format on
+                          },
+                          p);
       });
   return position.first * position.second;
 }
 
-Direction parse_dir(const std::string &direction) {
+Command cmd_factory(const std::string &direction, int64_t dist) {
   if ("forward" == direction) {
-    return Direction::FORWARD;
+    return Forward{dist};
+    ;
   } else if ("up" == direction) {
-    return Direction::UP;
+    return Up{dist};
   } else if ("down" == direction) {
-    return Direction::DOWN;
+    return Down{dist};
+    ;
   }
   throw std::runtime_error("Unknown direction");
 }
@@ -87,10 +87,10 @@ int main(int argc, char **argv) {
   int64_t distance;
   Input inputs;
   while (input_file >> direction >> distance) {
-    inputs.emplace_back(std::make_pair(parse_dir(direction), distance));
+    inputs.emplace_back(cmd_factory(direction, distance));
   }
 
-  fmt::print("{}\n", inputs);
+  // fmt::print("{}\n", inputs);
 
   {
     auto t1 = std::chrono::high_resolution_clock::now();
