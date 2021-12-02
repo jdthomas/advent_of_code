@@ -4,6 +4,8 @@ project(advent_of_code_2021)
 
 # set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 function(add_advent_of_code_project PROBLEM_NUM)
   add_executable(advent_of_code_2021_${PROBLEM_NUM}
