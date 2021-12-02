@@ -10,6 +10,9 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
+template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template <class... Ts> overload(Ts...) -> overload<Ts...>;
+
 struct CmdImpl {
   int64_t dist;
 };
@@ -17,9 +20,6 @@ struct Forward : CmdImpl {};
 struct Up : CmdImpl {};
 struct Down : CmdImpl {};
 using Command = std::variant<Forward, Up, Down>;
-
-template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
-template <class... Ts> overload(Ts...) -> overload<Ts...>;
 
 using InputItem = Command;
 using Input = std::vector<InputItem>;
@@ -49,11 +49,12 @@ int solve_problem_2(const Input &inputs) {
   auto position = ranges::accumulate(
       inputs, std::pair<uint64_t, Position>{0, {0, 0}},
       [](const auto &cur, const auto &nxt) -> std::pair<uint64_t, Position> {
-        // Takes current aim/position as first arg, distance/aim update as
-        // second and applies it.
         auto &[cur_aim, c] = cur;
-        auto aim = cur_aim + nxt.second;
-        return {aim, {c.first + nxt.first, c.second + nxt.first * aim}};
+        auto &[cur_pos, cur_depth] = c;
+        auto &[dist_update, aim_update] = nxt;
+
+        auto aim = cur_aim + aim_update;
+        return {aim, {cur_pos + dist_update, cur_depth + dist_update * aim}};
       },
       [](const Command &p) {
         // Emit a pair of distance / aim updates
@@ -66,7 +67,9 @@ int solve_problem_2(const Input &inputs) {
                           },
                           p);
       });
-  return position.second.first * position.second.second;
+  auto &[aim, c] = position;
+  auto &[pos, depth] = c;
+  return pos * depth;
 }
 
 Command cmd_factory(const std::string &direction, int64_t dist) {
