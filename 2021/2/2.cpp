@@ -28,8 +28,8 @@ using Position = std::pair<int64_t, int64_t>;
 int64_t solve_problem_1(const Input &inputs) {
   auto position = ranges::accumulate(
       inputs, Position{0, 0},
-      [](const auto &a, const auto &b) {
-        return std::make_pair(a.first + b.first, a.second + b.second);
+      [](const auto &cur, const auto &nxt) {
+        return std::make_pair(cur.first + nxt.first, cur.second + nxt.second);
       },
       [](const Command &p) {
         return std::visit(overload{
@@ -45,34 +45,37 @@ int64_t solve_problem_1(const Input &inputs) {
 }
 
 int solve_problem_2(const Input &inputs) {
-  int64_t aim{0};
+  using DistAimUpdate = std::pair<int64_t, int64_t>;
   auto position = ranges::accumulate(
-      inputs, Position{0, 0},
-      [](const auto &a, const auto &b) {
-        return std::make_pair(a.first + b.first, a.second + b.second);
+      inputs, std::pair<uint64_t, Position>{0, {0, 0}},
+      [](const auto &cur, const auto &nxt) -> std::pair<uint64_t, Position> {
+        // Takes current aim/position as first arg, distance/aim update as
+        // second and applies it.
+        auto &[cur_aim, c] = cur;
+        auto aim = cur_aim + nxt.second;
+        return {aim, {c.first + nxt.first, c.second + nxt.first * aim}};
       },
-      [&aim](const Command &p) {
+      [](const Command &p) {
+        // Emit a pair of distance / aim updates
         return std::visit(overload{
                               // clang-format off
-                              [&aim](Forward c) -> Position { return {c.dist, aim * c.dist}; },
-                              [&aim](Up c) -> Position { aim -= c.dist; return {0, 0}; },
-                              [&aim](Down c) -> Position { aim += c.dist; return {0, 0}; },
+                        [](Forward c) -> DistAimUpdate { return {c.dist, 0}; },
+                        [](Up c) -> DistAimUpdate { return {0, -c.dist}; },
+                        [](Down c) -> DistAimUpdate { return {0, c.dist}; },
                               // clang-format on
                           },
                           p);
       });
-  return position.first * position.second;
+  return position.second.first * position.second.second;
 }
 
 Command cmd_factory(const std::string &direction, int64_t dist) {
   if ("forward" == direction) {
     return Forward{dist};
-    ;
   } else if ("up" == direction) {
     return Up{dist};
   } else if ("down" == direction) {
     return Down{dist};
-    ;
   }
   throw std::runtime_error("Unknown direction");
 }
