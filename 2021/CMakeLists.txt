@@ -22,3 +22,4 @@ find_package(range-v3 REQUIRED)
 include_directories(${range-v3_INCLUDE_DIRS})
 
 add_advent_of_code_project(1)
+add_advent_of_code_project(2)
