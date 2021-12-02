@@ -23,13 +23,15 @@ using Command = std::variant<Forward, Up, Down>;
 
 using InputItem = Command;
 using Input = std::vector<InputItem>;
-using Position = std::pair<int64_t, int64_t>;
+struct Position {
+  int64_t horz, depth;
+};
 
 int64_t solve_problem_1(const Input &inputs) {
   auto position = ranges::accumulate(
       inputs, Position{0, 0},
-      [](const auto &cur, const auto &nxt) {
-        return std::make_pair(cur.first + nxt.first, cur.second + nxt.second);
+      [](const auto &cur, const auto &nxt) -> Position {
+        return {cur.horz + nxt.horz, cur.depth + nxt.depth};
       },
       [](const Command &p) {
         return std::visit(overload{
@@ -41,35 +43,32 @@ int64_t solve_problem_1(const Input &inputs) {
                           },
                           p);
       });
-  return position.first * position.second;
+  return position.horz * position.depth;
 }
 
 int solve_problem_2(const Input &inputs) {
-  using DistAimUpdate = std::pair<int64_t, int64_t>;
-  auto position = ranges::accumulate(
-      inputs, std::pair<uint64_t, Position>{0, {0, 0}},
-      [](const auto &cur, const auto &nxt) -> std::pair<uint64_t, Position> {
+  struct Update {
+    int64_t dist, aim;
+  };
+  auto [aim, position] = ranges::accumulate(
+      inputs, std::pair<int64_t, Position>{0, {0, 0}},
+      [](const auto &cur, const auto &update) -> std::pair<int64_t, Position> {
         auto &[cur_aim, c] = cur;
-        auto &[cur_pos, cur_depth] = c;
-        auto &[dist_update, aim_update] = nxt;
 
-        auto aim = cur_aim + aim_update;
-        return {aim, {cur_pos + dist_update, cur_depth + dist_update * aim}};
+        auto aim = cur_aim + update.aim;
+        return {aim, {c.horz + update.dist, c.depth + update.dist * aim}};
       },
-      [](const Command &p) {
-        // Emit a pair of distance / aim updates
+      [](const auto &p) {
         return std::visit(overload{
                               // clang-format off
-                        [](Forward c) -> DistAimUpdate { return {c.dist, 0}; },
-                        [](Up c) -> DistAimUpdate { return {0, -c.dist}; },
-                        [](Down c) -> DistAimUpdate { return {0, c.dist}; },
+                        [](Forward c) -> Update { return {c.dist, 0}; },
+                        [](Up c) -> Update { return {0, -c.dist}; },
+                        [](Down c) -> Update { return {0, c.dist}; },
                               // clang-format on
                           },
                           p);
       });
-  auto &[aim, c] = position;
-  auto &[pos, depth] = c;
-  return pos * depth;
+  return position.horz * position.depth;
 }
 
 Command cmd_factory(const std::string &direction, int64_t dist) {
