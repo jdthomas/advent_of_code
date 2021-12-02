@@ -14,22 +14,16 @@ using Input = std::vector<InputItem>;
 
 int solve_problem_1(const Input &inputs) {
   using namespace ranges;
-  Input partial(inputs.size());
-  adjacent_difference(inputs, partial,
-                      [](auto a, auto b) { return a > b ? 1 : 0; });
-
-  return accumulate(partial | views::drop(1), 0);
+  return distance(views::adjacent_filter(inputs, std::less{})) - 1;
 }
 
 int solve_problem_2(const Input &inputs) {
   using namespace ranges;
-  Input partial(inputs.size());
-  adjacent_difference(
-      inputs | views::sliding(3) |
-          views::transform([](auto window) { return accumulate(window, 0); }),
-      partial, [](auto a, auto b) { return a > b ? 1 : 0; });
-
-  return accumulate(partial | views::drop(1), 0);
+  return distance(inputs | views::sliding(3) |
+                  views::transform(
+                      [](auto window) { return accumulate(window, 0); }) |
+                  views::adjacent_filter(std::less{})) -
+         1;
 }
 
 int main(int argc, char **argv) {
