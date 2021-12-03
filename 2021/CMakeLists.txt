@@ -23,3 +23,4 @@ include_directories(${range-v3_INCLUDE_DIRS})
 
 add_advent_of_code_project(1)
 add_advent_of_code_project(2)
+add_advent_of_code_project(3)
