@@ -1,3 +1,5 @@
+![Actions BuildAndTest Status](https://github.com/jdthomas/advent_of_code/actions/workflows/cmake.yml/badge.svg)
+
 # Advent of code WIP
 
 Work in progress submissions for [Advent Of Code](https://adventofcode.com/).
