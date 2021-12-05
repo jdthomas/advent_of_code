@@ -3,6 +3,7 @@
   "version-string": "1.0.0",
   "dependencies": [
     "fmt",
-    "range-v3"
+    "range-v3",
+    "ctre"
   ]
 }

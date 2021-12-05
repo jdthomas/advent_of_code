@@ -14,6 +14,7 @@ project(advent_of_code)
 
 find_package(fmt REQUIRED)
 find_package(range-v3 REQUIRED)
+find_package(ctre REQUIRED)
 
 add_subdirectory(2020)
 add_subdirectory(2021)
