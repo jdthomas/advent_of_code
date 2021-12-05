@@ -1,11 +1,16 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <range/v3/action/sort.hpp>
 #include <range/v3/all.hpp>
+#include <sstream>
+#include <string>
 #include <variant>
 #include <vector>
 using namespace ranges;
