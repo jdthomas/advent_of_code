@@ -1,16 +1,22 @@
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <vector>
-
-#include <range/v3/action/sort.hpp>
-#include <range/v3/all.hpp>
-
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
+#include <chrono>
+#include <fstream>
+#include <iostream>
+#include <range/v3/action/sort.hpp>
+#include <range/v3/all.hpp>
+#include <vector>
+
 using InputItem = int64_t;
 using Input = std::vector<InputItem>;
+
+/// My favorite result for day01:
+/// https://twitter.com/tristanbrindle/status/1466116674554408971
+constexpr auto count_increasing = [](int win_sz, auto const &input) {
+  return std::inner_product(std::next(input.begin(), win_sz), input.end(),
+                            input.begin(), 0, std::plus{}, std::greater{});
+};
 
 int solve_problem_1(const Input &inputs) {
   using namespace ranges;
@@ -44,6 +50,7 @@ int main(int argc, char **argv) {
     auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
+    // assert(answer == count_increasing(1, inputs));
     fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
   }
 
@@ -54,6 +61,7 @@ int main(int argc, char **argv) {
     auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
+    // assert(answer == count_increasing(3, inputs));
     fmt::print("Result = {}, resolved in {}usec\n", answer, duration);
   }
 }
