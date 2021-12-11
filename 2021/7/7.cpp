@@ -6,7 +6,6 @@
 #include <charconv>
 #include <chrono>
 #include <cmath>
-#include <ctre.hpp>
 #include <fstream>
 #include <iostream>
 #include <numeric>
