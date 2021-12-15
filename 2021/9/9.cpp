@@ -24,7 +24,11 @@ struct Input {
 };
 
 int64_t solve_problem_1(const Input &inputs) {
-  auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  // auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  stdex::mdspan<InputItem,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      s(const_cast<InputItem *>(inputs.data.data()),
+        {inputs.height, inputs.width});
   auto is_minima = [&](auto i, auto j) {
     return (i <= 0 || (s(i - 1, j) > s(i, j))) &&
            (j <= 0 || (s(i, j - 1) > s(i, j))) &&
@@ -42,9 +46,16 @@ int64_t solve_problem_1(const Input &inputs) {
 }
 
 int64_t solve_problem_2(const Input &inputs) {
-  auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  // auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  stdex::mdspan<InputItem,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      s(const_cast<InputItem *>(inputs.data.data()),
+        {inputs.height, inputs.width});
   std::vector<int> seen(inputs.height * inputs.width);
-  auto m = stdex::mdspan(seen.data(), inputs.height, inputs.width);
+  // auto m = stdex::mdspan(seen.data(), inputs.height, inputs.width);
+  stdex::mdspan<int,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      m(seen.data(), {inputs.height, inputs.width});
   auto pos = ranges::views::cartesian_product(
       ranges::views::iota(0, static_cast<int>(s.extent(0))),
       ranges::views::iota(0, static_cast<int>(s.extent(1))));
