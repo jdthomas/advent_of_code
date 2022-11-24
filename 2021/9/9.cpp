@@ -3,6 +3,7 @@
 
 #include <bit>
 #include <chrono>
+#include <deque>
 #include <experimental/mdspan>
 #include <fstream>
 #include <iostream>
@@ -23,7 +24,11 @@ struct Input {
 };
 
 int64_t solve_problem_1(const Input &inputs) {
-  auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  // auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  stdex::mdspan<InputItem,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      s(const_cast<InputItem *>(inputs.data.data()),
+        {inputs.height, inputs.width});
   auto is_minima = [&](auto i, auto j) {
     return (i <= 0 || (s(i - 1, j) > s(i, j))) &&
            (j <= 0 || (s(i, j - 1) > s(i, j))) &&
@@ -40,7 +45,57 @@ int64_t solve_problem_1(const Input &inputs) {
                             0, std::plus{});
 }
 
-int64_t solve_problem_2(const Input &inputs) { return 55; }
+int64_t solve_problem_2(const Input &inputs) {
+  // auto s = stdex::mdspan(inputs.data.data(), inputs.height, inputs.width);
+  stdex::mdspan<InputItem,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      s(const_cast<InputItem *>(inputs.data.data()),
+        {inputs.height, inputs.width});
+  std::vector<int> seen(inputs.height * inputs.width);
+  // auto m = stdex::mdspan(seen.data(), inputs.height, inputs.width);
+  stdex::mdspan<int,
+                stdex::extents<stdex::dynamic_extent, stdex::dynamic_extent>>
+      m(seen.data(), {inputs.height, inputs.width});
+  auto pos = ranges::views::cartesian_product(
+      ranges::views::iota(0, static_cast<int>(s.extent(0))),
+      ranges::views::iota(0, static_cast<int>(s.extent(1))));
+  std::array<int64_t, 3> basin_sizes{};
+  for (const auto &[i, j] : pos) {
+    // for each position if it is not seen, do a BFS and save size of this basin
+    // if in top 3.
+    if (m(i, j) || s(i, j) == 9) continue;
+    {
+      std::deque<std::pair<int, int>> q{};
+      q.emplace_back(i, j);
+      int64_t basin_size = 0;
+      while (!q.empty()) {
+        auto cur = q.back();
+        q.pop_back();
+        // bounds check
+        if (cur.first < 0 || cur.second < 0 || cur.first >= s.extent(0) ||
+            cur.second >= s.extent(1))
+          continue;
+        // Check if we've seen this node
+        if (m(cur.first, cur.second)) continue;
+        // or it is a wall
+        if (s(cur.first, cur.second) == 9) continue;
+        basin_size += 1;
+        m(cur.first, cur.second) = 1;
+        // visit our neighbors
+        q.emplace_back(cur.first + 1, cur.second);
+        q.emplace_back(cur.first, cur.second + 1);
+        q.emplace_back(cur.first - 1, cur.second);
+        q.emplace_back(cur.first, cur.second - 1);
+      }
+      auto &me = *min_element(basin_sizes);
+      if (basin_size >= me) {
+        std::swap(me, basin_size);
+      }
+    }
+  }
+
+  return accumulate(basin_sizes, 1l, ranges::multiplies{});
+}
 
 int main(int argc, char **argv) {
   if (argc < 2) {
