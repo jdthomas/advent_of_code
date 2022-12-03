@@ -15,16 +15,16 @@ struct Arguments {
 
 fn solve_problem_1(args: &Arguments, lines: &[String]) -> Result<i64> {
     match args.day {
-        1 => aoc2022::day_1::solve_problem_1(lines),
-        2 => aoc2022::day_2::solve_problem_1(lines),
+        1 => aoc2022::day_01::solve_problem_1(lines),
+        2 => aoc2022::day_02::solve_problem_1(lines),
         _ => Err(anyhow!("Day not implemented")),
     }
 }
 
-fn solve_problem_2(args: &Arguments, lines: &Vec<String>) -> Result<i64> {
+fn solve_problem_2(args: &Arguments, lines:  &[String]) -> Result<i64> {
     match args.day {
-        1 => aoc2022::day_1::solve_problem_2(lines),
-        2 => aoc2022::day_2::solve_problem_2(lines),
+        1 => aoc2022::day_01::solve_problem_2(lines),
+        2 => aoc2022::day_02::solve_problem_2(lines),
         _ => Err(anyhow!("Day not implemented")),
     }
 }
