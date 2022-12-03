@@ -1,11 +1,9 @@
 use anyhow::Result;
 use itertools::Itertools;
 
-
-
-pub fn solve_problem_1(lines: Vec<String>) -> Result<i64> {
+pub fn solve_problem_1(lines: &[String]) -> Result<i64> {
     let result: i64 = lines
-        .into_iter()
+        .iter()
         .group_by(|line| line.is_empty())
         .into_iter()
         .filter(|(skip, _group)| !skip)
@@ -21,9 +19,9 @@ pub fn solve_problem_1(lines: Vec<String>) -> Result<i64> {
     Ok(result)
 }
 
-pub fn solve_problem_2(lines: Vec<String>) -> Result<i64> {
+pub fn solve_problem_2(lines: &[String]) -> Result<i64> {
     let result: i64 = lines
-        .into_iter()
+        .iter()
         .group_by(|line| line.is_empty())
         .into_iter()
         .filter(|(skip, _group)| !skip)

@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use anyhow::Result;
 use clap::Parser;
 
@@ -12,10 +13,26 @@ struct Arguments {
     filename: String,
 }
 
+fn solve_problem_1(args: &Arguments, lines: &[String]) -> Result<i64> {
+    match args.day {
+        1 => aoc2022::day_1::solve_problem_1(lines),
+        2 => aoc2022::day_2::solve_problem_1(lines),
+        _ => Err(anyhow!("Day not implemented")),
+    }
+}
+
+fn solve_problem_2(args: &Arguments, lines: &Vec<String>) -> Result<i64> {
+    match args.day {
+        1 => aoc2022::day_1::solve_problem_2(lines),
+        2 => aoc2022::day_2::solve_problem_2(lines),
+        _ => Err(anyhow!("Day not implemented")),
+    }
+}
+
 fn main() -> Result<()> {
     let args = Arguments::parse();
 
-    let file = File::open(args.filename)?;
+    let file = File::open(&args.filename)?;
     let lines: Result<Vec<String>> = std::io::BufReader::new(file)
         .lines()
         .into_iter()
@@ -23,28 +40,21 @@ fn main() -> Result<()> {
         .collect();
     let lines = lines?;
 
-    match args.day {
-        1 => {
-            let now = Instant::now();
-            let answer = aoc2022::day_1::solve_problem_1(lines.clone())?;
-            println!(
-                "Result = {}, resolved in {}usec\n",
-                answer,
-                now.elapsed().as_micros()
-            );
+    let now = Instant::now();
+    let answer = solve_problem_1(&args, &lines)?;
+    println!(
+        "Result = {}, resolved in {}usec\n",
+        answer,
+        now.elapsed().as_micros()
+    );
 
-            let now = Instant::now();
-            let answer = aoc2022::day_1::solve_problem_2(lines)?;
-            println!(
-                "Result = {}, resolved in {}usec\n",
-                answer,
-                now.elapsed().as_micros()
-            );
-        }
-        _ => {
-            println!("Day not implemented yet");
-        }
-    }
+    let now = Instant::now();
+    let answer = solve_problem_2(&args, &lines)?;
+    println!(
+        "Result = {}, resolved in {}usec\n",
+        answer,
+        now.elapsed().as_micros()
+    );
 
     Ok(())
 }
