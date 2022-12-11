@@ -1,7 +1,6 @@
 use anyhow::anyhow;
 use anyhow::Result;
 
-
 #[derive(Debug)]
 enum RPSResult {
     Win,
@@ -138,7 +137,6 @@ pub fn solve_problem_2(lines: &[String]) -> Result<i64> {
             let play = a.for_result_play(&b);
             // println!("elf={:?} desired={:?}, so play={:?}", a, b, play);
             b.score() + play.score()
-
         })
         .into_iter()
         .sum();
