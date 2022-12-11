@@ -14,3 +14,7 @@ For 2020 was playing with learning about c++20's ranges (via
 
 For 2021, I was hoping to use something new haskell or rust or something
 different.. but getting a late start will be using c++ .. again.
+
+## 2022
+
+For 2021, actually using rust
