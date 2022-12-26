@@ -1,14 +1,9 @@
 use anyhow::Result;
 use itertools::Itertools;
-use std::collections::HashMap;
+
 use std::collections::HashSet;
-use std::collections::VecDeque;
 
 type Point = (i64, i64);
-
-fn manhattan(a: Point, b: Point) -> i64 {
-    (a.0 - b.0).abs() + (a.1 - b.1).abs()
-}
 
 fn touching(a: Point, b: Point) -> bool {
     (a.0 - b.0).abs() <= 1 && (a.1 - b.1).abs() <= 1
@@ -21,7 +16,7 @@ pub fn solve_problem_1(lines: &[String]) -> Result<i64> {
 
     for line in lines {
         // update Head
-        let (dir, dist) = line.split_once(" ").unwrap();
+        let (dir, dist) = line.split_once(' ').unwrap();
         let mut dist = dist.parse::<i64>().unwrap();
         println!("{} {}", dir, dist);
         while dist > 0 {
@@ -75,7 +70,7 @@ pub fn solve_problem_2(lines: &[String]) -> Result<i64> {
     let mut all_tail_pos = HashSet::new();
 
     for line in lines {
-        let (dir, dist) = line.split_once(" ").unwrap();
+        let (dir, dist) = line.split_once(' ').unwrap();
         let mut dist = dist.parse::<i64>().unwrap();
         println!("------ > {} {}", dir, dist);
 
@@ -102,7 +97,7 @@ pub fn solve_problem_2(lines: &[String]) -> Result<i64> {
                 head = *tail
             });
 
-            all_tail_pos.insert(knots.last().unwrap().clone());
+            all_tail_pos.insert(*knots.last().unwrap());
             dist -= 1;
         }
     }
