@@ -23,6 +23,7 @@ fn solve_problem_1(args: &Arguments, lines: &[String]) -> Result<i64> {
         6 => aoc2022::day_06::solve_problem_1(lines),
         7 => aoc2022::day_07::solve_problem_1(lines),
         8 => aoc2022::day_08::solve_problem_1(lines),
+        9 => aoc2022::day_09::solve_problem_1(lines),
         _ => Err(anyhow!("Day not implemented")),
     }
 }
@@ -37,6 +38,7 @@ fn solve_problem_2(args: &Arguments, lines: &[String]) -> Result<i64> {
         6 => aoc2022::day_06::solve_problem_2(lines),
         7 => aoc2022::day_07::solve_problem_2(lines),
         8 => aoc2022::day_08::solve_problem_2(lines),
+        9 => aoc2022::day_09::solve_problem_2(lines),
         _ => Err(anyhow!("Day not implemented")),
     }
 }
